@@ -1,0 +1,40 @@
+name: CI
+run-name: "CI"
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+    - main
+
+jobs:
+  run-test:
+    name: "Run Test Suit"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test
+      run: |
+        echo 'Test!'
+
+  upload-screenshots:
+    name: "Upload Screenshots"
+    needs:
+    - run-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.15.0
+    - name: Install Percy CLI
+      run: npm install -g @percy/cli
+    - name: Upload Screenshots
+      env:
+        PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+      run: percy upload screenshots/test
